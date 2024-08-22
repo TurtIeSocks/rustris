@@ -5,6 +5,7 @@ use std::collections::BTreeSet;
 use rand::Rng;
 
 pub mod block;
+pub mod ghost;
 mod rotation;
 pub mod tetrimino;
 

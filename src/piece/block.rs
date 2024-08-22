@@ -36,6 +36,12 @@ impl Block {
         }
     }
 
+    pub fn ghost(&self, color: Color, visibility: Visibility) -> SpriteBundle {
+        let mut sprite = self.sprite(color, visibility);
+        sprite.sprite.color.set_alpha(0.25);
+        sprite
+    }
+
     pub fn shift_x(&mut self, count: i32) -> &mut Self {
         self.x += count;
         self

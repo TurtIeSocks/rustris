@@ -1,7 +1,7 @@
 use super::*;
 use crate::{
     audio,
-    piece::{block::Block, tetrimino::Tetrimino},
+    piece::{block::Block, ghost::Ghost, tetrimino::Tetrimino},
     state,
     ui::{
         self,
@@ -35,6 +35,29 @@ pub fn check_collision(
         movable.can_left = can_left;
         movable.can_right = can_right;
         movable.can_down = can_down;
+    }
+}
+
+pub fn draw_ghost(
+    mut commands: Commands,
+    mut piece_query: Query<(&Block, &Tetrimino), With<Tetrimino>>,
+    mut ghost_query: Query<Entity, With<Ghost>>,
+    current_state: ResMut<State<state::BoardState>>,
+) {
+    let current_state = current_state.get();
+    let mut min_shift = i32::MAX;
+    for (block, _) in &mut piece_query {
+        min_shift = min_shift.min(block.y - current_state.height(block.x));
+    }
+    for block in &mut ghost_query {
+        commands.entity(block).despawn();
+    }
+    for (block, tetrimino) in &mut piece_query {
+        let mut ghost_block = block.clone();
+        ghost_block.shift_y(-min_shift);
+        commands
+            .spawn(ghost_block.ghost(tetrimino.color(), Visibility::Visible))
+            .insert(Ghost);
     }
 }
 

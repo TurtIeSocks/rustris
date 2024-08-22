@@ -90,6 +90,7 @@ fn main() {
             (
                 gameplay::post_update::check_collision,
                 gameplay::post_update::remove_piece_component,
+                gameplay::post_update::draw_ghost,
                 gameplay::post_update::check_game_over
                     .after(gameplay::post_update::remove_piece_component),
                 gameplay::post_update::check_full_line
