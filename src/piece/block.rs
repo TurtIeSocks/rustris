@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::ui::board;
 
-pub const BLOCK_STICKER_LENGTH: f32 = 28.0;
+const BLOCK_STICKER_LENGTH: f32 = 28.0;
 
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Block {
@@ -36,25 +36,14 @@ impl Block {
         }
     }
 
-    pub fn shift(self, delta_x: Option<i32>, delta_y: Option<i32>) -> Self {
-        let mut new_block = self;
-        new_block.shift_mut(delta_x, delta_y);
-        new_block
+    pub fn shift_x(&mut self, count: i32) -> &mut Self {
+        self.x += count;
+        self
     }
 
-    pub fn shift_mut(&mut self, delta_x: Option<i32>, delta_y: Option<i32>) {
-        match delta_x {
-            Some(delta) => {
-                self.x += delta;
-            }
-            None => {}
-        }
-        match delta_y {
-            Some(delta) => {
-                self.y += delta;
-            }
-            None => {}
-        }
+    pub fn shift_y(&mut self, count: i32) -> &mut Self {
+        self.y += count;
+        self
     }
 
     pub fn reverse(&mut self) -> &mut Self {

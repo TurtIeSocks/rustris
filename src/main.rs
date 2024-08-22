@@ -12,8 +12,8 @@ mod ui;
 
 fn main() {
     App::new()
-        .insert_resource(ui::score::Score(0))
-        .insert_resource(ui::lines::Lines(0))
+        .insert_resource(ui::score::Score::default())
+        .insert_resource(ui::lines::Lines::default())
         .insert_resource(ui::next_piece::NextPieceType(None))
         .insert_resource(ClearColor(Color::BLACK))
         .insert_resource(gameplay::timers::AutoMove(Timer::new(
@@ -31,6 +31,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .init_state::<state::AppState>()
         .init_state::<state::GameState>()
+        .init_state::<state::BoardState>()
         .add_systems(
             Startup,
             (
@@ -75,6 +76,7 @@ fn main() {
             (
                 gameplay::inputs::move_piece,
                 gameplay::inputs::rotate_piece,
+                gameplay::inputs::send_to_bottom,
                 queue::auto_generate_new_piece,
                 ui::score::update,
                 ui::lines::update,

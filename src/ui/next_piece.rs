@@ -30,9 +30,10 @@ pub fn update(
         }
         let visibility = Visibility::Visible;
         let color = next_in_queue.variant.color();
-        for block in next_in_queue.variant.blocks().iter() {
+        for block in next_in_queue.variant.blocks().iter_mut() {
+            block.shift_x(8).shift_y(17);
             commands
-                .spawn(block.shift(Some(8), Some(17)).sprite(color, visibility))
+                .spawn(block.sprite(color, visibility))
                 .insert(NextPieceBoard);
         }
     }

@@ -3,14 +3,18 @@ use super::*;
 use crate::{
     audio,
     piece::{block::Block, tetrimino::Tetrimino},
+    state,
 };
+
+const PLAY_DROP_SOUND: bool = false;
 
 pub fn rotate_piece(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut q_piece: Query<(&mut Tetrimino, &mut Block, &mut Transform)>,
     q_board: Query<&Block, Without<Tetrimino>>,
+    current_state: ResMut<State<state::BoardState>>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::ArrowUp) {
+    if keyboard_input.just_pressed(KeyCode::Space) {
         let tetrimino = match q_piece.into_iter().next() {
             Some((piece_type, _, _)) => *piece_type,
             None => {
@@ -27,35 +31,37 @@ pub fn rotate_piece(
             match tetrimino {
                 Tetrimino::O | Tetrimino::L | Tetrimino::J => block
                     .reverse()
-                    .shift_mut(Some(sum_x / 4 - sum_y / 4), Some(sum_x / 4 + sum_y / 4 + 1)),
+                    .shift_x(sum_x / 4 - sum_y / 4)
+                    .shift_y(sum_x / 4 + sum_y / 4 + 1),
                 _ => block
                     .reverse()
-                    .shift_mut(Some(sum_x / 4 - sum_y / 4), Some(sum_x / 4 + sum_y / 4)),
+                    .shift_x(sum_x / 4 - sum_y / 4)
+                    .shift_y(sum_x / 4 + sum_y / 4),
             };
             transform.translation = block.translation();
         }
 
         if is_colliding(&q_piece, &q_board) {
             for (_, mut block, mut transform) in &mut q_piece {
-                block.shift_mut(Some(-1), None);
+                block.shift_x(-1);
                 transform.translation = block.translation();
             }
         }
         if is_colliding(&q_piece, &q_board) {
             for (_, mut block, mut transform) in &mut q_piece {
-                block.shift_mut(Some(-1), None);
+                block.shift_x(-1);
                 transform.translation = block.translation();
             }
         }
         if is_colliding(&q_piece, &q_board) {
             for (_, mut block, mut transform) in &mut q_piece {
-                block.shift_mut(Some(3), None);
+                block.shift_x(3);
                 transform.translation = block.translation();
             }
         }
         if is_colliding(&q_piece, &q_board) {
             for (_, mut block, mut transform) in &mut q_piece {
-                block.shift_mut(Some(3), None);
+                block.shift_x(3);
                 transform.translation = block.translation();
             }
         }
@@ -66,6 +72,23 @@ pub fn rotate_piece(
                 transform.translation = block.translation();
                 index += 1;
             }
+        }
+    }
+}
+
+pub fn send_to_bottom(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut q_piece: Query<(&mut Block, &mut Transform, &moveable::Movable), With<Tetrimino>>,
+    current_state: ResMut<State<state::BoardState>>,
+) {
+    if keyboard_input.just_pressed(KeyCode::ArrowUp) {
+        let mut min_shift = i32::MAX;
+        for (block, _, _) in &mut q_piece {
+            min_shift = min_shift.min(block.y - current_state.height(block.x));
+        }
+        for (mut block, mut transform, _) in &mut q_piece {
+            block.shift_y(-min_shift);
+            transform.translation = block.translation();
         }
     }
 }
@@ -113,30 +136,39 @@ pub fn move_piece(
 ) {
     manually_move_timer.0.tick(time.delta());
     auto_move_timer.0.tick(time.delta());
+
     let mut reset_manually_move_timer = false;
     for (mut block, mut transform, movable) in &mut query {
         let mut already_down = false;
         if auto_move_timer.0.just_finished() && movable.can_down {
-            block.y -= 1;
+            block.shift_y(-1);
 
-            game_audios.play(&mut commands, "drop");
+            if PLAY_DROP_SOUND {
+                game_audios.play(&mut commands, "drop");
+            }
             already_down = true;
         }
         if manually_move_timer.0.finished() {
             if keyboard_input.pressed(KeyCode::ArrowLeft) && movable.can_left {
-                block.x -= 1;
-                game_audios.play(&mut commands, "drop");
+                block.shift_x(-1);
+                if PLAY_DROP_SOUND {
+                    game_audios.play(&mut commands, "drop");
+                }
                 reset_manually_move_timer = true;
             } else if keyboard_input.pressed(KeyCode::ArrowRight) && movable.can_right {
-                block.x += 1;
-                game_audios.play(&mut commands, "drop");
+                block.shift_x(1);
+                if PLAY_DROP_SOUND {
+                    game_audios.play(&mut commands, "drop");
+                }
                 reset_manually_move_timer = true;
             } else if keyboard_input.pressed(KeyCode::ArrowDown)
                 && movable.can_down
                 && !already_down
             {
-                block.y -= 1;
-                game_audios.play(&mut commands, "drop");
+                block.shift_y(-1);
+                if PLAY_DROP_SOUND {
+                    game_audios.play(&mut commands, "drop");
+                }
                 reset_manually_move_timer = true;
             }
         }

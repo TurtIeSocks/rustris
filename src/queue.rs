@@ -31,15 +31,15 @@ pub fn auto_generate_new_piece(
     }
     if query.is_empty() {
         let piece = piece_queue.0.pop_front().unwrap();
+
         let color = piece.variant.color();
         let visibility = Visibility::Hidden;
 
-        for block in piece.variant.blocks().iter() {
-            let block = block.shift(None, Some(20));
+        for block in piece.variant.blocks().iter_mut() {
             commands
-                .spawn(piece.variant)
+                .spawn(*block.shift_y(20))
+                .insert(piece.variant)
                 .insert(block.sprite(color, visibility))
-                .insert(block)
                 .insert(Movable::default());
         }
     }

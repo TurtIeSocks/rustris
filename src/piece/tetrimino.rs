@@ -67,29 +67,6 @@ impl Tetrimino {
             Tetrimino::Z => SHAPE_Z.map(|pos| pos.into()).into(),
         }
     }
-
-    pub fn shift(self, delta_x: Option<i32>, delta_y: Option<i32>) -> Self {
-        let mut blocks = self.blocks();
-        match delta_x {
-            Some(delta) => {
-                blocks[0].x += delta;
-                blocks[1].x += delta;
-                blocks[2].x += delta;
-                blocks[3].x += delta;
-            }
-            None => {}
-        }
-        match delta_y {
-            Some(delta) => {
-                blocks[0].y += delta;
-                blocks[1].y += delta;
-                blocks[2].y += delta;
-                blocks[3].y += delta;
-            }
-            None => {}
-        }
-        self
-    }
 }
 
 impl From<usize> for Tetrimino {

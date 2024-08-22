@@ -22,11 +22,11 @@ impl Piece {
         }
     }
 
-    pub fn rotate(self) -> Self {
-        let mut piece = self;
-        piece.rotation.next();
-        piece
-    }
+    // pub fn rotate(self) -> Self {
+    //     let mut piece = self;
+    //     piece.rotation.next();
+    //     piece
+    // }
 }
 
 pub fn random_pieces(amount: usize) -> Vec<Piece> {
