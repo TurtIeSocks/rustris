@@ -17,3 +17,16 @@ pub fn setup(windows: Query<&Window>, mut gizmos: Gizmos) {
         )
         .outer_edges();
 }
+
+pub fn manage_config(
+    mut config_store: ResMut<GizmoConfigStore>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    time: Res<Time>,
+) {
+    let (config, _) = config_store.config_mut::<DefaultGizmoConfigGroup>();
+    if keyboard.just_pressed(KeyCode::KeyG) {
+        config.enabled = !config.enabled;
+        // config.line_width += 5. * time.delta_seconds();
+        // config.line_width = config.line_width.clamp(0., 50.);
+    }
+}
