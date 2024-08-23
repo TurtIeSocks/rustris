@@ -2,19 +2,23 @@ use super::*;
 
 use crate::{
     audio,
-    piece::{block::Block, tetrimino::Tetrimino},
+    piece::{
+        block::Block,
+        tetrimino::{self, Tetrimino},
+    },
     state,
+    ui::hold,
 };
 
 const PLAY_DROP_SOUND: bool = false;
 
 pub fn rotate_piece(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut q_piece: Query<(&mut Tetrimino, &mut Block, &mut Transform)>,
-    q_board: Query<&Block, Without<Tetrimino>>,
-    current_state: ResMut<State<state::BoardState>>,
+    mut q_piece: Query<(&mut Tetrimino, &mut Block, &mut Transform), With<moveable::Movable>>,
+    q_board: Query<&Block, Without<moveable::Movable>>,
+    current_state: Res<State<state::BoardState>>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::Space) {
+    if keyboard_input.just_pressed(KeyCode::ArrowUp) {
         let tetrimino = match q_piece.into_iter().next() {
             Some((piece_type, _, _)) => *piece_type,
             None => {
@@ -41,31 +45,31 @@ pub fn rotate_piece(
             transform.translation = block.translation();
         }
 
-        if is_colliding(&q_piece, &q_board) {
+        if is_colliding(&q_piece, &q_board, &current_state) {
             for (_, mut block, mut transform) in &mut q_piece {
                 block.shift_x(-1);
                 transform.translation = block.translation();
             }
         }
-        if is_colliding(&q_piece, &q_board) {
+        if is_colliding(&q_piece, &q_board, &current_state) {
             for (_, mut block, mut transform) in &mut q_piece {
                 block.shift_x(-1);
                 transform.translation = block.translation();
             }
         }
-        if is_colliding(&q_piece, &q_board) {
+        if is_colliding(&q_piece, &q_board, &current_state) {
             for (_, mut block, mut transform) in &mut q_piece {
                 block.shift_x(3);
                 transform.translation = block.translation();
             }
         }
-        if is_colliding(&q_piece, &q_board) {
+        if is_colliding(&q_piece, &q_board, &current_state) {
             for (_, mut block, mut transform) in &mut q_piece {
                 block.shift_x(3);
                 transform.translation = block.translation();
             }
         }
-        if is_colliding(&q_piece, &q_board) {
+        if is_colliding(&q_piece, &q_board, &current_state) {
             let mut index = 0;
             for (_, mut block, mut transform) in &mut q_piece {
                 *block = original_blocks[index];
@@ -78,10 +82,10 @@ pub fn rotate_piece(
 
 pub fn send_to_bottom(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut q_piece: Query<(&mut Block, &mut Transform, &moveable::Movable), With<Tetrimino>>,
-    current_state: ResMut<State<state::BoardState>>,
+    mut q_piece: Query<(&mut Block, &mut Transform, &moveable::Movable), With<moveable::Movable>>,
+    current_state: Res<State<state::BoardState>>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::ArrowUp) {
+    if keyboard_input.just_pressed(KeyCode::Space) {
         let mut min_shift = i32::MAX;
         for (block, _, _) in &mut q_piece {
             min_shift = min_shift.min(block.y - current_state.height(block.x));
@@ -94,20 +98,38 @@ pub fn send_to_bottom(
 }
 
 pub fn is_colliding(
-    piece_query: &Query<(&mut Tetrimino, &mut Block, &mut Transform)>,
-    board_query: &Query<&Block, Without<Tetrimino>>,
+    piece_query: &Query<(&mut Tetrimino, &mut Block, &mut Transform), With<moveable::Movable>>,
+    board_query: &Query<&Block, Without<moveable::Movable>>,
+    current_state: &Res<State<state::BoardState>>,
 ) -> bool {
     for (_, block, _) in piece_query {
         if block.x < 0 {
+            info!("Colliding left");
             return true;
         }
         if block.x > 9 {
+            println!("Colliding right");
             return true;
         }
         if block.y < 0 {
+            println!("Colliding down");
             return true;
         }
     }
+
+    // for (_, block, _) in piece_query {
+    //     if block.x < 0 || current_state.check_collision(block.x - 1, block.y) {
+    //         println!("Colliding left");
+    //         return true;
+    //     }
+    //     if block.x > 9 || current_state.check_collision(block.x + 1, block.y) {
+    //         return true;
+    //     }
+    //     if block.y < 0 || current_state.check_collision(block.x, block.y - 1) {
+    //         println!("Colliding down");
+    //         return true;
+    //     }
+    // }
 
     for (_, block, _) in piece_query {
         for board_block in board_query {
@@ -128,7 +150,7 @@ pub fn is_colliding(
 pub fn move_piece(
     mut commands: Commands,
     game_audios: Res<audio::GameAudio>,
-    mut query: Query<(&mut Block, &mut Transform, &moveable::Movable), With<Tetrimino>>,
+    mut query: Query<(&mut Block, &mut Transform, &moveable::Movable), With<moveable::Movable>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut manually_move_timer: ResMut<timers::ManualMove>,
     mut auto_move_timer: ResMut<timers::AutoMove>,
@@ -176,5 +198,35 @@ pub fn move_piece(
     }
     if reset_manually_move_timer {
         manually_move_timer.0.reset();
+    }
+}
+
+pub fn swap_piece(
+    mut commands: Commands,
+    mut q_piece_blocks: Query<(Entity, &mut Block), With<moveable::Movable>>,
+    mut held_piece_blocks: Query<
+        (Entity, &mut Block),
+        (With<tetrimino::Tetrimino>, Without<moveable::Movable>),
+    >,
+    mut held_res: ResMut<hold::Hold>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+) {
+    if keyboard_input.just_pressed(KeyCode::KeyC) && held_res.0 {
+        let (mut x, mut y) = (i32::MAX, i32::MAX);
+        for (entity, block) in &mut q_piece_blocks {
+            let (block_x, block_y) = block.dist_to_hold();
+            x = x.min(block_x);
+            y = y.min(block_y);
+            commands.entity(entity).remove::<moveable::Movable>();
+        }
+        for (entity, mut block) in &mut q_piece_blocks {
+            block.shift_x(x).shift_y(y);
+            commands.entity(entity).remove::<moveable::Movable>();
+            held_res.set(false);
+        }
+        for (entity, mut block) in &mut held_piece_blocks {
+            block.shift_x(9);
+            commands.entity(entity).insert(moveable::Movable::default());
+        }
     }
 }

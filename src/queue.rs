@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use std::collections::VecDeque;
 
 use crate::{
-    gameplay::moveable::Movable,
+    gameplay::moveable::{self, Movable},
     piece::{self, tetrimino},
 };
 
@@ -23,7 +23,7 @@ pub fn setup(mut commands: Commands) {
 
 pub fn auto_generate_new_piece(
     mut commands: Commands,
-    query: Query<&tetrimino::Tetrimino>,
+    query: Query<&tetrimino::Tetrimino, With<moveable::Movable>>,
     mut piece_queue: ResMut<Queue>,
 ) {
     if piece_queue.0.len() < tetrimino::Tetrimino::AMOUNT {
@@ -37,7 +37,7 @@ pub fn auto_generate_new_piece(
 
         for block in piece.variant.blocks().iter_mut() {
             commands
-                .spawn(*block.shift_y(20))
+                .spawn(*block.shift_y(18))
                 .insert(piece.variant)
                 .insert(block.sprite(color, visibility))
                 .insert(Movable::default());

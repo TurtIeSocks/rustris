@@ -79,6 +79,7 @@ fn main() {
                 gameplay::inputs::move_piece,
                 gameplay::inputs::rotate_piece,
                 gameplay::inputs::send_to_bottom,
+                gameplay::inputs::swap_piece,
                 queue::auto_generate_new_piece,
                 ui::grid::setup,
                 ui::grid::manage_config,

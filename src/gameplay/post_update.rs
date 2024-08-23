@@ -6,11 +6,12 @@ use crate::{
     ui::{
         self,
         board::{COL_COUNT, ROW_COUNT},
+        hold,
     },
 };
 
 pub fn check_collision(
-    mut piece_query: Query<(&mut Block, &mut moveable::Movable), With<Tetrimino>>,
+    mut piece_query: Query<(&mut Block, &mut moveable::Movable), With<moveable::Movable>>,
     current_state: ResMut<State<state::BoardState>>,
 ) {
     let mut can_down = true;
@@ -40,7 +41,7 @@ pub fn check_collision(
 
 pub fn draw_ghost(
     mut commands: Commands,
-    mut piece_query: Query<(&Block, &Tetrimino), With<Tetrimino>>,
+    mut piece_query: Query<(&Block, &Tetrimino), With<moveable::Movable>>,
     mut ghost_query: Query<Entity, With<Ghost>>,
     current_state: ResMut<State<state::BoardState>>,
 ) {
@@ -69,6 +70,7 @@ pub fn remove_piece_component(
     time: Res<Time>,
     current_state: ResMut<State<state::BoardState>>,
     mut change_board_state: ResMut<NextState<state::BoardState>>,
+    mut held_res: ResMut<hold::Hold>,
 ) {
     if !q_piece_blocks.is_empty() && !q_piece_blocks.iter().last().unwrap().2.can_down {
         if !q_piece_blocks.iter().last().unwrap().2.can_down {
@@ -83,7 +85,10 @@ pub fn remove_piece_component(
         if !movable.can_down {
             if timer.0.just_finished() || keyboard_input.pressed(KeyCode::ArrowDown) {
                 next_board_state.place_block(block);
-                commands.entity(entity).remove::<Tetrimino>();
+                commands
+                    .entity(entity)
+                    .remove::<Tetrimino>()
+                    .remove::<moveable::Movable>();
                 reset_timer = true;
             }
         }
@@ -92,6 +97,7 @@ pub fn remove_piece_component(
         println!("{}", next_board_state);
         change_board_state.set(next_board_state);
         timer.0.reset();
+        held_res.set(true);
     }
 }
 

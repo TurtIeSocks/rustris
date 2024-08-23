@@ -12,7 +12,7 @@ pub struct NextPieceType(pub Option<Piece>);
 pub struct NextPieceBoard;
 
 pub fn setup(mut commands: Commands) {
-    let (x, y, scale) = (COL_COUNT - 1.0, ROW_COUNT / 2.0, 6.);
+    let (x, y, scale) = (COL_COUNT - 1.0, ROW_COUNT / 2.0, 4.5);
 
     SpriteBundle::square(scale, x, y)
         .into_iter()
@@ -44,7 +44,7 @@ pub fn update(
         let visibility = Visibility::Visible;
         let color = next_in_queue.variant.color();
         for block in next_in_queue.variant.blocks().iter_mut() {
-            block.shift_x(10).shift_y(16);
+            block.shift_x(9).shift_y(17);
             commands
                 .spawn(block.sprite(color, visibility))
                 .insert(NextPieceBoard);
