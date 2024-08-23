@@ -9,6 +9,10 @@ pub struct Score(u32);
 pub struct Scoreboard;
 
 pub fn setup(mut commands: Commands, windows: Query<&Window>) {
+    if windows.is_empty() {
+        return;
+    }
+
     commands
         .spawn(util::get_stats_ui(windows, "Score: ", 0.))
         .insert(Scoreboard);

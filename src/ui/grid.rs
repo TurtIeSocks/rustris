@@ -3,6 +3,9 @@ use crate::piece::block::BLOCK_LENGTH;
 use super::*;
 
 pub fn setup(windows: Query<&Window>, mut gizmos: Gizmos) {
+    if windows.is_empty() {
+        return;
+    }
     let window = windows.single();
     let x = (window.width() as f32 / BLOCK_LENGTH).ceil() as u32;
     let y = (window.height() as f32 / BLOCK_LENGTH).ceil() as u32;
