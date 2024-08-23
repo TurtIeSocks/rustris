@@ -78,6 +78,7 @@ fn main() {
                 gameplay::inputs::rotate_piece,
                 gameplay::inputs::send_to_bottom,
                 queue::auto_generate_new_piece,
+                ui::grid::setup,
                 ui::score::update,
                 ui::lines::update,
                 ui::next_piece::update,
