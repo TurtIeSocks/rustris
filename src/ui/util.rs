@@ -1,13 +1,13 @@
-use bevy::prelude::*;
+use super::*;
 
-use crate::ui::board::BLOCK_LENGTH;
+use crate::piece::block::BLOCK_LENGTH;
 
 pub const STATS_BOARD_LENGTH: f32 = 220.0;
 pub const STATS_BOARD_WIDTH: f32 = 50.0;
 
 pub fn get_stats_ui(windows: Query<&Window>, label: &str, offset: f32) -> TextBundle {
     let window = windows.single();
-    let (left, top) = (
+    let (left, bottom) = (
         window.physical_width() as f32 / 2.0 - 5. * BLOCK_LENGTH,
         window.physical_height() as f32 / 2.0 - 10. * BLOCK_LENGTH,
     );
@@ -31,7 +31,7 @@ pub fn get_stats_ui(windows: Query<&Window>, label: &str, offset: f32) -> TextBu
     ])
     .with_style(Style {
         position_type: PositionType::Absolute,
-        top: Val::Px(top + offset),
+        bottom: Val::Px(bottom + offset),
         left: Val::Px(left - STATS_BOARD_LENGTH),
         ..default()
     })

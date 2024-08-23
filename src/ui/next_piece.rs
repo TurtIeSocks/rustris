@@ -1,3 +1,6 @@
+use board::{COL_COUNT, ROW_COUNT};
+use line::Shape;
+
 use super::*;
 
 use crate::{piece::Piece, queue};
@@ -7,6 +10,16 @@ pub struct NextPieceType(pub Option<Piece>);
 
 #[derive(Debug, Component)]
 pub struct NextPieceBoard;
+
+pub fn setup(mut commands: Commands) {
+    let (x, y, scale) = (COL_COUNT - 1.0, ROW_COUNT / 2.0, 6.);
+
+    SpriteBundle::square(scale, x, y)
+        .into_iter()
+        .for_each(|shape| {
+            commands.spawn(shape);
+        });
+}
 
 pub fn reset(mut commands: Commands, query: Query<Entity, With<NextPieceBoard>>) {
     for entity in &query {
@@ -31,7 +44,7 @@ pub fn update(
         let visibility = Visibility::Visible;
         let color = next_in_queue.variant.color();
         for block in next_in_queue.variant.blocks().iter_mut() {
-            block.shift_x(8).shift_y(17);
+            block.shift_x(10).shift_y(16);
             commands
                 .spawn(block.sprite(color, visibility))
                 .insert(NextPieceBoard);

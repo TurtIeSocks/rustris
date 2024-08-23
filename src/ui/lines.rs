@@ -1,6 +1,6 @@
-use bevy::prelude::*;
+use super::*;
 
-use crate::ui::stats;
+use crate::ui::util;
 
 #[derive(Resource, Default)]
 pub struct Lines(u32);
@@ -10,10 +10,10 @@ pub struct Linesboard;
 
 pub fn setup(mut commands: Commands, windows: Query<&Window>) {
     commands
-        .spawn(stats::get_stats_ui(
+        .spawn(util::get_stats_ui(
             windows,
             "Lines: ",
-            stats::STATS_BOARD_WIDTH,
+            util::STATS_BOARD_WIDTH,
         ))
         .insert(Linesboard);
 }

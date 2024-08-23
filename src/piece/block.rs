@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::ui::board;
 
 const BLOCK_STICKER_LENGTH: f32 = 28.0;
+pub const BLOCK_LENGTH: f32 = 30.0;
 
 #[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Block {
@@ -13,8 +14,8 @@ pub struct Block {
 impl Block {
     pub fn translation(&self) -> Vec3 {
         Vec3 {
-            x: (self.x as f32 - (board::COL_COUNT / 2.0) + 0.5) * board::BLOCK_LENGTH,
-            y: (self.y as f32 - (board::ROW_COUNT / 2.0) + 0.5) * board::BLOCK_LENGTH,
+            x: (self.x as f32 - (board::COL_COUNT / 2.0) + 0.5) * BLOCK_LENGTH,
+            y: (self.y as f32 - (board::ROW_COUNT / 2.0) + 0.5) * BLOCK_LENGTH,
             z: 0.0,
         }
     }

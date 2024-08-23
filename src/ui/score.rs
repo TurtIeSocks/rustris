@@ -1,6 +1,6 @@
 use super::*;
 
-use crate::ui::stats;
+use crate::ui::util;
 
 #[derive(Resource, Default)]
 pub struct Score(u32);
@@ -10,7 +10,7 @@ pub struct Scoreboard;
 
 pub fn setup(mut commands: Commands, windows: Query<&Window>) {
     commands
-        .spawn(stats::get_stats_ui(windows, "Score: ", 0.))
+        .spawn(util::get_stats_ui(windows, "Score: ", 0.))
         .insert(Scoreboard);
 }
 
