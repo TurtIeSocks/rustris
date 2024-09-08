@@ -156,6 +156,11 @@ pub fn move_piece(
     mut auto_move_timer: ResMut<timers::AutoMove>,
     time: Res<Time>,
 ) {
+    if keyboard_input.just_pressed(KeyCode::Space) {
+        manually_move_timer.0.reset();
+        auto_move_timer.0.reset();
+        return;
+    }
     manually_move_timer.0.tick(time.delta());
     auto_move_timer.0.tick(time.delta());
 
@@ -183,10 +188,8 @@ pub fn move_piece(
                     game_audios.play(&mut commands, "drop");
                 }
                 reset_manually_move_timer = true;
-            } else if keyboard_input.pressed(KeyCode::ArrowDown)
-                && movable.can_down
-                && !already_down
-            {
+            }
+            if keyboard_input.pressed(KeyCode::ArrowDown) && movable.can_down && !already_down {
                 block.shift_y(-1);
                 if PLAY_DROP_SOUND {
                     game_audios.play(&mut commands, "drop");

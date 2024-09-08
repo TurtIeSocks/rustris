@@ -21,7 +21,7 @@ fn main() {
             TimerMode::Repeating,
         )))
         .insert_resource(gameplay::timers::ManualMove(Timer::new(
-            Duration::from_millis(100),
+            Duration::from_millis(110),
             TimerMode::Once,
         )))
         .insert_resource(gameplay::timers::RemovePieceComponent(Timer::new(

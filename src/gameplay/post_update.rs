@@ -1,3 +1,5 @@
+use moveable::Movable;
+
 use super::*;
 use crate::{
     audio,
@@ -64,7 +66,7 @@ pub fn draw_ghost(
 
 pub fn remove_piece_component(
     mut commands: Commands,
-    q_piece_blocks: Query<(Entity, &Block, &moveable::Movable), With<Tetrimino>>,
+    q_piece_blocks: Query<(Entity, &Block, &moveable::Movable), With<Movable>>,
     mut timer: ResMut<timers::RemovePieceComponent>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
@@ -83,7 +85,10 @@ pub fn remove_piece_component(
     let mut next_board_state = current_state.get().clone();
     for (entity, block, movable) in &q_piece_blocks {
         if !movable.can_down {
-            if timer.0.just_finished() || keyboard_input.pressed(KeyCode::ArrowDown) {
+            if timer.0.just_finished()
+                || keyboard_input.pressed(KeyCode::ArrowDown)
+                || keyboard_input.pressed(KeyCode::Space)
+            {
                 next_board_state.place_block(block);
                 commands
                     .entity(entity)
@@ -94,7 +99,7 @@ pub fn remove_piece_component(
         }
     }
     if reset_timer {
-        println!("{}", next_board_state);
+        info!("\n{}", next_board_state);
         change_board_state.set(next_board_state);
         timer.0.reset();
         held_res.set(true);
@@ -106,14 +111,13 @@ pub fn check_game_over(
     game_audios: Res<audio::GameAudio>,
     mut app_state: ResMut<NextState<state::AppState>>,
     mut game_state: ResMut<NextState<state::GameState>>,
-    query: Query<&Block, Without<Tetrimino>>,
+    current_state: ResMut<State<state::BoardState>>,
 ) {
-    let mut max_block_y = 0;
-    for block in &query {
-        if block.y > max_block_y {
-            max_block_y = block.y;
-        }
-    }
+    let state = current_state.get();
+    let max_block_y = (0..COL_COUNT as i32)
+        .map(|x| state.height(x))
+        .max()
+        .unwrap();
     if max_block_y >= (ROW_COUNT - 1.) as i32 {
         game_audios.play(&mut commands, "gameover");
         app_state.set(state::AppState::GameOver);
@@ -154,14 +158,13 @@ pub fn check_full_line(
         next_board_state.clear_line(*line_no);
         for (entity, mut block, mut transform) in &mut query {
             if !despawn_entities.contains(&entity) && block.y > *line_no as i32 {
-                info!("down block: {:?}, line_no: {}", block, line_no);
                 block.y -= 1;
                 transform.translation = block.translation();
             }
         }
     }
     if full_lines.len() > 0 {
-        println!("{}", next_board_state);
+        info!("\n{}", next_board_state);
         change_board_state.set(next_board_state);
     }
 }
