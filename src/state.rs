@@ -32,21 +32,40 @@ pub struct BoardState {
 
 impl Display for BoardState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "┌{}┐", "─".repeat(COL_COUNT as usize))?;
-        for row in self.board.iter().rev() {
-            write!(f, "│")?;
+        // Write board
+        writeln!(f, "   ┌{}┐", "─".repeat(COL_COUNT as usize))?;
+        for (y, row) in self.board.iter().enumerate().rev() {
+            let label = format!("{:2}", y);
+            write!(f, "{label} │")?;
             for cell in row.iter() {
                 write!(f, "{}", if *cell { "X" } else { " " })?;
             }
             write!(f, "│")?;
             writeln!(f)?;
         }
-        writeln!(f, "└{}┘", "─".repeat(COL_COUNT as usize))?;
-        write!(f, "|")?;
-        for height in self.heights.iter() {
-            write!(f, "{}", height)?;
+        writeln!(f, "   └{}┘", "─".repeat(COL_COUNT as usize))?;
+
+        // Write column numbers
+        write!(f, "    ")?;
+        for x in 0..(COL_COUNT as usize) {
+            write!(f, "{x}")?;
         }
-        write!(f, "|")?;
+        writeln!(f)?;
+        writeln!(f)?;
+
+        // Write heights
+        write!(f, "    ")?;
+        write!(
+            f,
+            "{}",
+            self.heights
+                .iter()
+                .map(|h| h.to_string())
+                .collect::<Vec<_>>()
+                .join(",")
+        )?;
+        writeln!(f)?;
+
         Ok(())
     }
 }
@@ -69,7 +88,12 @@ impl BoardState {
             self.board[row - 1] = self.board[row];
         }
         for col in 0..COL_COUNT as usize {
-            self.heights[col] -= 1;
+            self.heights[col] = 0;
+            for row in 0..ROW_COUNT as usize {
+                if self.board[row][col] {
+                    self.heights[col] = row as i32 + 1;
+                }
+            }
         }
     }
 

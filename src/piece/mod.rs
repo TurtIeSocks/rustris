@@ -30,6 +30,8 @@ impl Piece {
     // }
 }
 
+// if rng.gen_bool(0.2) { 0 } else { 3 }.into()
+
 pub fn random_pieces(amount: usize) -> Vec<Piece> {
     let mut rng = rand::thread_rng();
     let mut piece_type_set = BTreeSet::new();

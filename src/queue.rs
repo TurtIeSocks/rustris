@@ -37,7 +37,7 @@ pub fn auto_generate_new_piece(
 
         for block in piece.variant.blocks().iter_mut() {
             commands
-                .spawn(*block.shift_y(18))
+                .spawn(*block.shift_y(19))
                 .insert(piece.variant)
                 .insert(block.sprite(color, visibility))
                 .insert(Movable::default());
