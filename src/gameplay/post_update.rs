@@ -50,7 +50,7 @@ pub fn draw_ghost(
     let current_state = current_state.get();
     let mut min_shift = i32::MAX;
     for (block, _) in &mut piece_query {
-        min_shift = min_shift.min(block.y - current_state.height(block.x));
+        min_shift = min_shift.min(block.y - current_state.height(block.x, block.y));
     }
     for block in &mut ghost_query {
         commands.entity(block).despawn();
@@ -59,7 +59,7 @@ pub fn draw_ghost(
         let mut ghost_block = block.clone();
         ghost_block.shift_y(-min_shift);
         commands
-            .spawn(ghost_block.ghost(tetrimino.color(), Visibility::Visible))
+            .spawn(ghost_block.ghost(tetrimino.color(), Visibility::Inherited))
             .insert(Ghost);
     }
 }
@@ -111,17 +111,14 @@ pub fn check_game_over(
     game_audios: Res<audio::GameAudio>,
     mut app_state: ResMut<NextState<state::AppState>>,
     mut game_state: ResMut<NextState<state::GameState>>,
-    current_state: ResMut<State<state::BoardState>>,
+    q_piece_blocks: Query<(&Block, &moveable::Movable), With<Movable>>,
 ) {
-    let state = current_state.get();
-    let max_block_y = (0..COL_COUNT as i32)
-        .map(|x| state.height(x))
-        .max()
-        .unwrap();
-    if max_block_y >= (ROW_COUNT - 1.) as i32 {
-        game_audios.play(&mut commands, "gameover");
-        app_state.set(state::AppState::GameOver);
-        game_state.set(state::GameState::GameQuit);
+    for (block, movable) in &q_piece_blocks {
+        if !movable.can_down && block.y >= ROW_COUNT as i32 {
+            game_audios.play(&mut commands, "gameover");
+            app_state.set(state::AppState::GameOver);
+            game_state.set(state::GameState::GameQuit);
+        }
     }
 }
 

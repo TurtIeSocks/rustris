@@ -19,7 +19,7 @@ impl Block {
         Vec3 {
             x: (self.x as f32 - (board::COL_COUNT / 2.0) + 0.5) * BLOCK_LENGTH,
             y: (self.y as f32 - (board::ROW_COUNT / 2.0) + 0.5) * BLOCK_LENGTH,
-            z: 0.0,
+            z: 1.0,
         }
     }
 
@@ -47,6 +47,7 @@ impl Block {
     pub fn ghost(&self, color: Color, visibility: Visibility) -> SpriteBundle {
         let mut sprite = self.sprite(color, visibility);
         sprite.sprite.color.set_alpha(0.1);
+        sprite.transform.translation.z = -1.0;
         sprite
     }
 

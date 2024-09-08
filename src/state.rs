@@ -27,7 +27,6 @@ pub enum GameState {
 #[derive(Debug, Clone, Eq, PartialEq, Hash, States, Default)]
 pub struct BoardState {
     board: [[bool; COL_COUNT as usize]; ROW_COUNT as usize],
-    heights: [i32; COL_COUNT as usize],
 }
 
 impl Display for BoardState {
@@ -53,19 +52,6 @@ impl Display for BoardState {
         writeln!(f)?;
         writeln!(f)?;
 
-        // Write heights
-        write!(f, "    ")?;
-        write!(
-            f,
-            "{}",
-            self.heights
-                .iter()
-                .map(|h| h.to_string())
-                .collect::<Vec<_>>()
-                .join(",")
-        )?;
-        writeln!(f)?;
-
         Ok(())
     }
 }
@@ -79,21 +65,12 @@ impl BoardState {
             return;
         }
         self.board[block.y as usize][block.x as usize] = true;
-        self.heights[block.x as usize] = self.heights[block.x as usize].max(block.y + 1);
     }
 
     pub fn clear_line(&mut self, y: usize) {
         self.board[y] = [false; COL_COUNT as usize];
         for row in (y + 1)..(ROW_COUNT as usize) {
             self.board[row - 1] = self.board[row];
-        }
-        for col in 0..COL_COUNT as usize {
-            self.heights[col] = 0;
-            for row in 0..ROW_COUNT as usize {
-                if self.board[row][col] {
-                    self.heights[col] = row as i32 + 1;
-                }
-            }
         }
     }
 
@@ -111,11 +88,17 @@ impl BoardState {
             .collect::<Vec<_>>()
     }
 
-    pub fn height(&self, x: i32) -> i32 {
-        if x >= COL_COUNT as i32 {
+    pub fn height(&self, x: i32, cur_y: i32) -> i32 {
+        if x >= COL_COUNT as i32 || cur_y >= ROW_COUNT as i32 {
             return 0;
         }
-        self.heights[x as usize]
+        let mut height = 0;
+        for row in 0..cur_y as usize {
+            if self.board[row][x as usize] {
+                height = row as i32 + 1;
+            }
+        }
+        height
     }
 
     pub fn check_collision(&self, x: i32, y: i32) -> bool {

@@ -88,7 +88,7 @@ pub fn send_to_bottom(
     if keyboard_input.just_pressed(KeyCode::Space) {
         let mut min_shift = i32::MAX;
         for (block, _, _) in &mut q_piece {
-            min_shift = min_shift.min(block.y - current_state.height(block.x));
+            min_shift = min_shift.min(block.y - current_state.height(block.x, block.y));
         }
         for (mut block, mut transform, _) in &mut q_piece {
             block.shift_y(-min_shift);
