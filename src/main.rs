@@ -28,7 +28,13 @@ fn main() {
             Duration::from_millis(300),
             TimerMode::Once,
         )))
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                title: "Rustris".into(),
+                ..default()
+            }),
+            ..default()
+        }))
         .init_state::<state::AppState>()
         .init_state::<state::GameState>()
         .init_state::<state::BoardState>()
@@ -36,6 +42,7 @@ fn main() {
             Startup,
             (
                 setup_camera,
+                ui::grid::set_false,
                 ui::board::setup,
                 ui::score::setup,
                 ui::lines::setup,

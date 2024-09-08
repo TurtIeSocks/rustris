@@ -213,11 +213,10 @@ pub fn swap_piece(
 ) {
     if keyboard_input.just_pressed(KeyCode::KeyC) && held_res.0 {
         let (mut x, mut y) = (i32::MAX, i32::MAX);
-        for (entity, block) in &mut q_piece_blocks {
+        for (_, block) in &mut q_piece_blocks {
             let (block_x, block_y) = block.dist_to_hold();
             x = x.min(block_x);
             y = y.min(block_y);
-            commands.entity(entity).remove::<moveable::Movable>();
         }
         for (entity, mut block) in &mut q_piece_blocks {
             block.shift_x(x).shift_y(y);

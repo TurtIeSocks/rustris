@@ -24,5 +24,5 @@ pub fn setup(mut commands: Commands) {
             commands.spawn(shape);
         });
 
-    commands.insert_resource(Hold(false))
+    commands.insert_resource(Hold(true))
 }

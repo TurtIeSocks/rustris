@@ -58,11 +58,7 @@ impl Shape for SpriteBundle {
                 ..default()
             },
             sprite: Sprite {
-                color: if horizontal {
-                    BORDER_COLOR
-                } else {
-                    Color::Srgba(WHITE)
-                },
+                color: BORDER_COLOR,
                 ..default()
             },
             ..default()

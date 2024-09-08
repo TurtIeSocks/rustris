@@ -21,6 +21,11 @@ pub fn setup(windows: Query<&Window>, mut gizmos: Gizmos) {
         .outer_edges();
 }
 
+pub fn set_false(mut config_store: ResMut<GizmoConfigStore>) {
+    let (config, _) = config_store.config_mut::<DefaultGizmoConfigGroup>();
+    config.enabled = false;
+}
+
 pub fn manage_config(
     mut config_store: ResMut<GizmoConfigStore>,
     keyboard: Res<ButtonInput<KeyCode>>,
