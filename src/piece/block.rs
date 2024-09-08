@@ -1,9 +1,6 @@
 use bevy::prelude::*;
 
-use crate::ui::{
-    board,
-    hold::{HOLD_X, HOLD_Y},
-};
+use crate::ui::board;
 
 const BLOCK_STICKER_LENGTH: f32 = 28.0;
 pub const BLOCK_LENGTH: f32 = 30.0;
@@ -38,10 +35,6 @@ impl Block {
             visibility,
             ..default()
         }
-    }
-
-    pub fn dist_to_hold(&self) -> (i32, i32) {
-        (HOLD_X - self.x, HOLD_Y - self.y)
     }
 
     pub fn ghost(&self, color: Color, visibility: Visibility) -> SpriteBundle {

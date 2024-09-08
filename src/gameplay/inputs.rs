@@ -2,38 +2,29 @@ use super::*;
 
 use crate::{
     audio,
-    piece::{
-        block::Block,
-        tetrimino::{self, Tetrimino},
-    },
+    piece::{block::Block, variant::Variant, Piece},
     state,
-    ui::hold,
+    ui::hold::{self, HOLD_X, HOLD_Y},
 };
 
 const PLAY_DROP_SOUND: bool = false;
 
 pub fn rotate_piece(
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut q_piece: Query<(&mut Tetrimino, &mut Block, &mut Transform), With<moveable::Movable>>,
+    mut q_piece: Query<(&mut Piece, &mut Block, &mut Transform), With<moveable::Movable>>,
     q_board: Query<&Block, Without<moveable::Movable>>,
     current_state: Res<State<state::BoardState>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::ArrowUp) {
-        let tetrimino = match q_piece.into_iter().next() {
-            Some((piece_type, _, _)) => *piece_type,
-            None => {
-                return;
-            }
-        };
         let sum_x = q_piece.iter().map(|(_, block, _)| block.x).sum::<i32>();
         let sum_y = q_piece.iter().map(|(_, block, _)| block.y).sum::<i32>();
 
         let original_blocks: Vec<Block> =
             q_piece.iter().map(|(_, block, _)| block.clone()).collect();
 
-        for (_, mut block, mut transform) in &mut q_piece {
-            match tetrimino {
-                Tetrimino::O | Tetrimino::L | Tetrimino::J => block
+        for (piece, mut block, mut transform) in &mut q_piece {
+            match piece.variant {
+                Variant::O | Variant::L | Variant::J => block
                     .reverse()
                     .shift_x(sum_x / 4 - sum_y / 4)
                     .shift_y(sum_x / 4 + sum_y / 4 + 1),
@@ -98,7 +89,7 @@ pub fn send_to_bottom(
 }
 
 pub fn is_colliding(
-    piece_query: &Query<(&mut Tetrimino, &mut Block, &mut Transform), With<moveable::Movable>>,
+    piece_query: &Query<(&mut Piece, &mut Block, &mut Transform), With<moveable::Movable>>,
     board_query: &Query<&Block, Without<moveable::Movable>>,
     current_state: &Res<State<state::BoardState>>,
 ) -> bool {
@@ -206,24 +197,25 @@ pub fn move_piece(
 
 pub fn swap_piece(
     mut commands: Commands,
-    mut q_piece_blocks: Query<(Entity, &mut Block), With<moveable::Movable>>,
-    mut held_piece_blocks: Query<
-        (Entity, &mut Block),
-        (With<tetrimino::Tetrimino>, Without<moveable::Movable>),
-    >,
+    mut q_piece_blocks: Query<(Entity, &mut Piece), With<moveable::Movable>>,
+    mut held_piece_blocks: Query<(Entity, &mut Block), (With<Piece>, Without<moveable::Movable>)>,
     mut held_res: ResMut<hold::Hold>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::KeyC) && held_res.0 {
-        let (mut x, mut y) = (i32::MAX, i32::MAX);
-        for (_, block) in &mut q_piece_blocks {
-            let (block_x, block_y) = block.dist_to_hold();
-            x = x.min(block_x);
-            y = y.min(block_y);
+        if let Some((_, piece)) = q_piece_blocks.iter().next() {
+            let variant = piece.variant;
+            let color = variant.color();
+            let visibility = Visibility::Visible;
+            for block in variant.blocks().iter_mut() {
+                commands
+                    .spawn(*block.shift_x(HOLD_X).shift_y(HOLD_Y))
+                    .insert(*piece)
+                    .insert(block.sprite(color, visibility));
+            }
         }
-        for (entity, mut block) in &mut q_piece_blocks {
-            block.shift_x(x).shift_y(y);
-            commands.entity(entity).remove::<moveable::Movable>();
+        for (entity, _) in &mut q_piece_blocks {
+            commands.entity(entity).despawn();
             held_res.set(false);
         }
         for (entity, mut block) in &mut held_piece_blocks {

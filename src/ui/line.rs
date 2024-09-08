@@ -1,5 +1,3 @@
-use bevy::color::palettes::css::WHITE;
-
 use super::*;
 
 use crate::piece::block::BLOCK_LENGTH;

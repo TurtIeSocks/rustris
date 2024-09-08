@@ -3,7 +3,7 @@ use moveable::Movable;
 use super::*;
 use crate::{
     audio,
-    piece::{block::Block, ghost::Ghost, tetrimino::Tetrimino},
+    piece::{block::Block, ghost::Ghost, Piece},
     state,
     ui::{
         self,
@@ -43,7 +43,7 @@ pub fn check_collision(
 
 pub fn draw_ghost(
     mut commands: Commands,
-    mut piece_query: Query<(&Block, &Tetrimino), With<moveable::Movable>>,
+    mut piece_query: Query<(&Block, &Piece), With<moveable::Movable>>,
     mut ghost_query: Query<Entity, With<Ghost>>,
     current_state: ResMut<State<state::BoardState>>,
 ) {
@@ -55,11 +55,11 @@ pub fn draw_ghost(
     for block in &mut ghost_query {
         commands.entity(block).despawn();
     }
-    for (block, tetrimino) in &mut piece_query {
+    for (block, piece) in &mut piece_query {
         let mut ghost_block = block.clone();
         ghost_block.shift_y(-min_shift);
         commands
-            .spawn(ghost_block.ghost(tetrimino.color(), Visibility::Inherited))
+            .spawn(ghost_block.ghost(piece.variant.color(), Visibility::Inherited))
             .insert(Ghost);
     }
 }
@@ -92,7 +92,7 @@ pub fn remove_piece_component(
                 next_board_state.place_block(block);
                 commands
                     .entity(entity)
-                    .remove::<Tetrimino>()
+                    .remove::<Piece>()
                     .remove::<moveable::Movable>();
                 reset_timer = true;
             }
@@ -127,7 +127,7 @@ pub fn check_full_line(
     game_audios: Res<audio::GameAudio>,
     mut score: ResMut<ui::score::Score>,
     mut lines: ResMut<ui::lines::Lines>,
-    mut query: Query<(Entity, &mut Block, &mut Transform), Without<Tetrimino>>,
+    mut query: Query<(Entity, &mut Block, &mut Transform), Without<Piece>>,
     current_state: ResMut<State<state::BoardState>>,
     mut change_board_state: ResMut<NextState<state::BoardState>>,
 ) {

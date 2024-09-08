@@ -3,8 +3,8 @@ use super::*;
 use board::{COL_COUNT, ROW_COUNT};
 use line::Shape;
 
-pub const HOLD_X: i32 = -3;
-pub const HOLD_Y: i32 = 18;
+pub const HOLD_X: i32 = -9;
+pub const HOLD_Y: i32 = 17;
 
 #[derive(Debug, Resource)]
 pub struct Hold(pub bool);

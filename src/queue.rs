@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 
 use crate::{
     gameplay::moveable::{self, Movable},
-    piece::{self, tetrimino},
+    piece::{self, variant},
     state,
 };
 
@@ -24,11 +24,11 @@ pub fn setup(mut commands: Commands) {
 
 pub fn auto_generate_new_piece(
     mut commands: Commands,
-    query: Query<&tetrimino::Tetrimino, With<moveable::Movable>>,
+    query: Query<&piece::Piece, With<moveable::Movable>>,
     mut piece_queue: ResMut<Queue>,
     current_state: ResMut<State<state::BoardState>>,
 ) {
-    if piece_queue.0.len() < tetrimino::Tetrimino::AMOUNT {
+    if piece_queue.0.len() < variant::AMOUNT {
         piece_queue.0.extend(piece::random_pieces(7));
     }
     if query.is_empty() {
@@ -38,7 +38,7 @@ pub fn auto_generate_new_piece(
         let visibility = Visibility::Hidden;
 
         let shift = match piece.variant {
-            tetrimino::Tetrimino::I => 19,
+            variant::Variant::I => 19,
             _ => 18,
         };
         let board_state = current_state.get();
@@ -53,7 +53,7 @@ pub fn auto_generate_new_piece(
         for block in piece.variant.blocks().iter_mut() {
             commands
                 .spawn(*block.shift_y(second_shift))
-                .insert(piece.variant)
+                .insert(piece)
                 .insert(block.sprite(color, visibility))
                 .insert(Movable::default());
         }

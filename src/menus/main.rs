@@ -35,7 +35,7 @@ pub fn setup(mut commands: Commands) {
                     // 标题
                     parent.spawn(
                         TextBundle::from_section(
-                            "Tetris Main Menu",
+                            "Rustris Main Menu",
                             TextStyle {
                                 font_size: 25.0,
                                 color: Color::srgb(0.9, 0.9, 0.9),
