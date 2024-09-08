@@ -13,7 +13,6 @@ pub fn rotate_piece(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut q_piece: Query<(&mut Piece, &mut Block, &mut Transform), With<moveable::Movable>>,
     q_board: Query<&Block, Without<moveable::Movable>>,
-    current_state: Res<State<state::BoardState>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::ArrowUp) {
         let sum_x = q_piece.iter().map(|(_, block, _)| block.x).sum::<i32>();
@@ -36,31 +35,31 @@ pub fn rotate_piece(
             transform.translation = block.translation();
         }
 
-        if is_colliding(&q_piece, &q_board, &current_state) {
+        if is_colliding(&q_piece, &q_board) {
             for (_, mut block, mut transform) in &mut q_piece {
                 block.shift_x(-1);
                 transform.translation = block.translation();
             }
         }
-        if is_colliding(&q_piece, &q_board, &current_state) {
+        if is_colliding(&q_piece, &q_board) {
             for (_, mut block, mut transform) in &mut q_piece {
                 block.shift_x(-1);
                 transform.translation = block.translation();
             }
         }
-        if is_colliding(&q_piece, &q_board, &current_state) {
+        if is_colliding(&q_piece, &q_board) {
             for (_, mut block, mut transform) in &mut q_piece {
                 block.shift_x(3);
                 transform.translation = block.translation();
             }
         }
-        if is_colliding(&q_piece, &q_board, &current_state) {
+        if is_colliding(&q_piece, &q_board) {
             for (_, mut block, mut transform) in &mut q_piece {
                 block.shift_x(3);
                 transform.translation = block.translation();
             }
         }
-        if is_colliding(&q_piece, &q_board, &current_state) {
+        if is_colliding(&q_piece, &q_board) {
             let mut index = 0;
             for (_, mut block, mut transform) in &mut q_piece {
                 *block = original_blocks[index];
@@ -91,36 +90,18 @@ pub fn send_to_bottom(
 pub fn is_colliding(
     piece_query: &Query<(&mut Piece, &mut Block, &mut Transform), With<moveable::Movable>>,
     board_query: &Query<&Block, Without<moveable::Movable>>,
-    current_state: &Res<State<state::BoardState>>,
 ) -> bool {
     for (_, block, _) in piece_query {
         if block.x < 0 {
-            info!("Colliding left");
             return true;
         }
         if block.x > 9 {
-            println!("Colliding right");
             return true;
         }
         if block.y < 0 {
-            println!("Colliding down");
             return true;
         }
     }
-
-    // for (_, block, _) in piece_query {
-    //     if block.x < 0 || current_state.check_collision(block.x - 1, block.y) {
-    //         println!("Colliding left");
-    //         return true;
-    //     }
-    //     if block.x > 9 || current_state.check_collision(block.x + 1, block.y) {
-    //         return true;
-    //     }
-    //     if block.y < 0 || current_state.check_collision(block.x, block.y - 1) {
-    //         println!("Colliding down");
-    //         return true;
-    //     }
-    // }
 
     for (_, block, _) in piece_query {
         for board_block in board_query {
