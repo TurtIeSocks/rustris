@@ -7,7 +7,7 @@ use crate::{
     ui::hold::{self, HOLD_X, HOLD_Y},
 };
 
-const PLAY_DROP_SOUND: bool = false;
+const PLAY_DROP_SOUND: bool = true;
 
 pub fn rotate_piece(
     keyboard_input: Res<ButtonInput<KeyCode>>,
@@ -138,15 +138,6 @@ pub fn move_piece(
 
     let mut reset_manually_move_timer = false;
     for (mut block, mut transform, movable) in &mut query {
-        let mut already_down = false;
-        if auto_move_timer.0.just_finished() && movable.can_down {
-            block.shift_y(-1);
-
-            if PLAY_DROP_SOUND {
-                game_audios.play(&mut commands, "drop");
-            }
-            already_down = true;
-        }
         if manually_move_timer.0.finished() {
             if keyboard_input.pressed(KeyCode::ArrowLeft) && movable.can_left {
                 block.shift_x(-1);
@@ -161,14 +152,23 @@ pub fn move_piece(
                 }
                 reset_manually_move_timer = true;
             }
-            if keyboard_input.pressed(KeyCode::ArrowDown) && movable.can_down && !already_down {
+            if keyboard_input.pressed(KeyCode::ArrowDown) && movable.can_down {
                 block.shift_y(-1);
                 if PLAY_DROP_SOUND {
                     game_audios.play(&mut commands, "drop");
                 }
                 reset_manually_move_timer = true;
+                auto_move_timer.0.reset();
             }
         }
+        if auto_move_timer.0.just_finished() && movable.can_down {
+            block.shift_y(-1);
+
+            if PLAY_DROP_SOUND {
+                game_audios.play(&mut commands, "drop");
+            }
+        }
+
         transform.translation = block.translation();
     }
     if reset_manually_move_timer {

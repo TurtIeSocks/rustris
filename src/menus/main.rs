@@ -32,7 +32,6 @@ pub fn setup(mut commands: Commands) {
                     ..default()
                 })
                 .with_children(|parent| {
-                    // 标题
                     parent.spawn(
                         TextBundle::from_section(
                             "Rustris Main Menu",
@@ -48,7 +47,6 @@ pub fn setup(mut commands: Commands) {
                         }),
                     );
 
-                    // 开始按钮
                     parent
                         .spawn((
                             ButtonBundle {
@@ -77,7 +75,6 @@ pub fn setup(mut commands: Commands) {
                             ));
                         });
 
-                    // 退出按钮
                     parent
                         .spawn((
                             ButtonBundle {

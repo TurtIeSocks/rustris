@@ -27,25 +27,38 @@ pub enum GameState {
 #[derive(Debug, Clone, Eq, PartialEq, Hash, States, Default)]
 pub struct BoardState {
     board: [[bool; COL_COUNT as usize]; ROW_COUNT as usize],
+    prev_board: [[bool; COL_COUNT as usize]; ROW_COUNT as usize],
 }
 
 impl Display for BoardState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // Write board
-        writeln!(f, "   ┌{}┐", "─".repeat(COL_COUNT as usize))?;
-        for (y, row) in self.board.iter().enumerate().rev() {
-            let label = format!("{:2}", y);
-            write!(f, "{label} │")?;
-            for cell in row.iter() {
+        write!(f, "┌{}┐", "─".repeat(COL_COUNT as usize))?;
+        writeln!(f, "    ┌{}┐", "─".repeat(COL_COUNT as usize))?;
+        for y in (0..(ROW_COUNT as usize)).rev() {
+            write!(f, "│")?;
+            for cell in self.prev_board[y].iter() {
                 write!(f, "{}", if *cell { "X" } else { " " })?;
             }
-            write!(f, "│")?;
-            writeln!(f)?;
+            write!(f, "│ ")?;
+            let label = format!("{:2}", y);
+            write!(f, "{label} │")?;
+
+            for (x, cell) in self.board[y].iter().enumerate() {
+                let label = if self.prev_board[y][x] != *cell {
+                    "O"
+                } else {
+                    "X"
+                };
+                write!(f, "{}", if *cell { label } else { " " })?;
+            }
+            writeln!(f, "│")?;
         }
-        writeln!(f, "   └{}┘", "─".repeat(COL_COUNT as usize))?;
+        write!(f, "└{}┘", "─".repeat(COL_COUNT as usize))?;
+        writeln!(f, "    └{}┘", "─".repeat(COL_COUNT as usize))?;
 
         // Write column numbers
-        write!(f, "    ")?;
+        write!(f, "  Previous       ")?;
         for x in 0..(COL_COUNT as usize) {
             write!(f, "{x}")?;
         }
@@ -72,6 +85,10 @@ impl BoardState {
         for row in (y + 1)..(ROW_COUNT as usize) {
             self.board[row - 1] = self.board[row];
         }
+    }
+
+    pub fn set_prev(&mut self) {
+        self.prev_board = self.board.clone();
     }
 
     pub fn full_lines(&self) -> Vec<usize> {

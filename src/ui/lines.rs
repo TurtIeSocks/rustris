@@ -34,5 +34,5 @@ impl Lines {
 
 pub fn update(lines: Res<Lines>, mut query: Query<&mut Text, With<Linesboard>>) {
     let mut text = query.single_mut();
-    text.sections[1].value = lines.0.to_string();
+    text.sections[2].value = lines.0.to_string();
 }

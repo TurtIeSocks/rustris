@@ -83,6 +83,7 @@ pub fn remove_piece_component(
     }
     let mut reset_timer: bool = false;
     let mut next_board_state = current_state.get().clone();
+    next_board_state.set_prev();
     for (entity, block, movable) in &q_piece_blocks {
         if !movable.can_down {
             if timer.0.just_finished()
@@ -151,6 +152,7 @@ pub fn check_full_line(
     }
     full_lines.sort();
     full_lines.reverse();
+    next_board_state.set_prev();
     for line_no in full_lines.iter() {
         next_board_state.clear_line(*line_no);
         for (entity, mut block, mut transform) in &mut query {

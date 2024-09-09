@@ -3,7 +3,7 @@ use super::*;
 use crate::piece::block::BLOCK_LENGTH;
 
 pub const STATS_BOARD_LENGTH: f32 = 220.0;
-pub const STATS_BOARD_WIDTH: f32 = 50.0;
+pub const STATS_BOARD_WIDTH: f32 = 100.0;
 
 pub fn get_stats_ui(windows: Query<&Window>, label: &str, offset: f32) -> TextBundle {
     let window = windows.single();
@@ -20,6 +20,7 @@ pub fn get_stats_ui(windows: Query<&Window>, label: &str, offset: f32) -> TextBu
                 ..default()
             },
         ),
+        TextSection::new("\n", TextStyle::default()),
         TextSection::new(
             "0",
             TextStyle {
@@ -33,6 +34,10 @@ pub fn get_stats_ui(windows: Query<&Window>, label: &str, offset: f32) -> TextBu
         position_type: PositionType::Absolute,
         bottom: Val::Px(bottom + offset),
         left: Val::Px(left - STATS_BOARD_LENGTH),
+        width: Val::Px(STATS_BOARD_LENGTH),
+        display: Display::Flex,
+        align_items: AlignItems::Center,
+        justify_content: JustifyContent::Center,
         ..default()
     })
 }

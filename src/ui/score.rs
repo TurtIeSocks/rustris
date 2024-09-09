@@ -37,5 +37,5 @@ impl Score {
 
 pub fn update(score: Res<Score>, mut query: Query<&mut Text, With<Scoreboard>>) {
     let mut text = query.single_mut();
-    text.sections[1].value = score.0.to_string();
+    text.sections[2].value = score.0.to_string();
 }
