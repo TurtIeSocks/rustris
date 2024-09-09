@@ -27,7 +27,6 @@ The goal of **Rustris** is to clear lines by strategically stacking different-sh
 ### Prerequisites
 
 - [Rust](https://www.rust-lang.org/) (latest stable version)
-- [Bevy Engine](https://bevyengine.org/) (0.11 or later)
 
 ### Running the Game
 
