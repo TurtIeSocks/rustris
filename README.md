@@ -26,12 +26,12 @@ The goal of **Rustris** is to clear lines by strategically stacking different-sh
 
 ### Prerequisites
 
-- [Rust](https://www.rust-lang.org/) (latest stable version)
+- [Rust 1.77.0](https://www.rust-lang.org/) (latest stable version)
 
 ### Running the Game
 
 ```bash
-git clone https://github.com/yourusername/rustris.git
+git clone https://github.com/TurtIeSocks/rustris.git
 cd rustris
 cargo run -r
 ```
@@ -48,3 +48,4 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 Developed with Rust and Bevy.
 Inspired by the original Tetris game, created by Alexey Pajitnov in 1984.
+Some ideas borrowed from [NightsWatchGames](https://github.com/NightsWatchGames/tetris)
