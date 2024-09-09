@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Rustris</title>
+  </head>
+  <body>
+    <script type="module">
+      import init from './rustris.js' // Replace with your actual wasm-bindgen output file
+      init().then(() => {
+        console.log('Game initialized')
+      })
+    </script>
+  </body>
+</html>

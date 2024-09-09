@@ -1,0 +1,35 @@
+name: Deploy Rustris to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+
+      - name: Install wasm-bindgen-cli
+        run: cargo install wasm-bindgen-cli
+
+      - name: Build the project for WebAssembly
+        run: cargo build --release --target wasm32-unknown-unknown
+
+      - name: Generate WASM bindings
+        run: |
+          wasm-bindgen --out-dir web --target web target/wasm32-unknown-unknown/release/rustris.wasm
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web
