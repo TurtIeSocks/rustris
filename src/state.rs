@@ -9,18 +9,18 @@ use crate::{
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash, States, Default)]
 pub enum AppState {
-    MainMenu,
     #[default]
+    MainMenu,
     InGame,
     GameOver,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, States, Default)]
 pub enum GameState {
-    #[default]
     GamePlaying,
     GamePaused,
     GameRestarted,
+    #[default]
     GameQuit,
 }
 

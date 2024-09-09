@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::state::{AppState, GameState};
+use crate::state::{AppState, BoardState, GameState};
 
 #[derive(Component)]
 pub enum Button {
@@ -15,6 +15,7 @@ pub fn click(
     mut interaction_query: Query<(&Interaction, &Button), (Changed<Interaction>, With<Button>)>,
     mut app_state: ResMut<NextState<AppState>>,
     mut game_state: ResMut<NextState<GameState>>,
+    mut board_state: ResMut<NextState<BoardState>>,
     mut exit: EventWriter<AppExit>,
 ) {
     for (interaction, menu_button_action) in &mut interaction_query {
@@ -24,6 +25,7 @@ pub fn click(
                     info!("StartGame button clicked");
                     app_state.set(AppState::InGame);
                     game_state.set(GameState::GamePlaying);
+                    board_state.set(BoardState::default());
                 }
                 Button::RestartGame => {
                     info!("RestartGame button clicked");
