@@ -93,7 +93,6 @@ fn main() {
                 ui::score::update,
                 ui::lines::update,
                 ui::next_piece::update,
-                piece::control_visibility,
             )
                 .run_if(in_state(state::GameState::GamePlaying)),
         )

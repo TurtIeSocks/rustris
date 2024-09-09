@@ -29,13 +29,3 @@ pub fn random_pieces(amount: usize) -> Vec<Piece> {
 
     piece_type_set.into_iter().collect()
 }
-
-pub fn control_visibility(mut q_piece: Query<(&mut Visibility, &block::Block), With<Piece>>) {
-    for (mut visibility, block) in &mut q_piece {
-        if block.y > 19 {
-            *visibility = Visibility::Hidden;
-        } else {
-            *visibility = Visibility::Visible;
-        }
-    }
-}

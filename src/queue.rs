@@ -35,7 +35,7 @@ pub fn auto_generate_new_piece(
         let piece = piece_queue.0.pop_front().unwrap();
 
         let color = piece.variant.color();
-        let visibility = Visibility::Hidden;
+        let visibility = Visibility::Visible;
 
         let shift = match piece.variant {
             variant::Variant::I => 19,
